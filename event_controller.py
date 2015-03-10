@@ -8,11 +8,11 @@ def invoke_mqtt(file):
 	strVoid = ""
 
 def invoke_py(file):
-	if(os.path.exists(file):
+	if(os.path.exists(file)):
 		os.system("/usr/bin/python " + file) # its dirty, its nasty, but its oh so delicious
 
 def invoke_cmd(file):
-	if(os.path.exists(file):
+	if(os.path.exists(file)):
 		os.system("/bin/bash " + file) # its dirty, its nasty, but its oh so delicious
 
 def process_event_folder(path):
@@ -27,6 +27,6 @@ def process_event_file(path):
 	if(path.endswith(".mqtt")):
 		strVoid = "" # Handle MQTT file
 	elif(path.endswith(".py")):
-		strVoid = "" # Handle MQTT file
-	elif(path.endswith(".sh")):
-		strVoid = "" # Handle MQTT file
+		invoke_py(path)
+	elif(path.endswith(".cmd")):
+		invoke_cmd(path)
