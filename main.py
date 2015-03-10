@@ -90,16 +90,15 @@ def handle_crontab(client,msg,smsg):
 	
 	currentTimePath_a = config.working_dir + "/events/crontab/everyday/" + strHour + strMinute + "/"
 	currentTimePath_b = config.working_dir + "/events/crontab/" + strDow + "/" + strHour + strMinute + "/"
-	
-	print("Checking paths:")
-	print(currentTimePath_a)
-	print(currentTimePath_b)
+	everycron = config.working_dir + "/events/crontab/everycron/"
 	
 	if(os.path.exists(currentTimePath_a)):
 		event_controller.process_event_folder(currentTimePath_a)
 	
 	if(os.path.exists(currentTimePath_b)):
 		event_controller.process_event_folder(currentTimePath_b)
+		
+	event_controller.process_event_folder(everycron)
 	
 	
 
