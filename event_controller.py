@@ -25,7 +25,7 @@ def process_event_folder(path):
 def process_event_file(path):
 	# Process each event file
 	if(path.endswith(".mqtt")):
-		strVoid = "" # Handle MQTT file
+		invoke_mqtt(path)
 	elif(path.endswith(".py")):
 		invoke_py(path)
 	elif(path.endswith(".cmd")):
