@@ -3,6 +3,7 @@
 # Import our configuration
 import config # import our configuration
 import event_controller # import our event controller
+import lifx_controller # import our LIFX Controller
 
 # Import external modules
 import paho.mqtt.client as mqtt
@@ -143,6 +144,9 @@ def on_connect(client, userdata, flags, rc):
 	
 	# Crontab
 	client.subscribe("crontab")
+
+	# Lifx
+	client.subscribe("lifx")
 	
 	threading.Timer(10, timer_poll_devices).start()
 	
@@ -171,6 +175,8 @@ def on_message(client, userdata, msg):
 		handle_device_sys(client,msg,newStr)
 	elif(str(msg.topic) == "crontab"):
 		handle_crontab(client,msg,newStr)
+	elif(str(msg.topic) == "lifx"):
+		lifx_controller.handle_lifx_message(client,msg,newStr)
 	else: # Message we don't recognise...
 		sVoid = ""
 
