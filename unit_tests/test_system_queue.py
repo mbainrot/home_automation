@@ -68,7 +68,7 @@ class test_system_queue(unittest.TestCase):
         kargs = {#'self': self,
                  'topic': "sys",
                  'message': "!unittest|4567",
-                 'delay': 0.1}
+                 'delay': 0.5}
 
         t = threading.Thread(target=self._send_delayed_message,kwargs=(kargs))
         t.start()
