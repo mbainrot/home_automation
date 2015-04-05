@@ -33,6 +33,9 @@ def handle_sys(client, msg):
             client.publish("sys_" + dev_mac, "!registered")
             client.publish("sys_" + dev_mac, "!ping|1234")
 
+        if(command == "!unittest"):
+            client.publish("unittest","!hello")
+
 
 def handle_device_input(client, msg, smsg):
     parts = smsg.split("|")

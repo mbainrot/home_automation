@@ -1,0 +1,14 @@
+language: python
+python:
+  - "3.4"
+cache:
+  directories:
+    - $HOME/.pip-cache
+install:
+  - pip install flake8 --download-cache $HOME/.pip-cache
+  - pip install -r requirements.txt --use-mirrors --download-cache $HOME/.pip-cache
+before_script:
+  - cp config.example.py config.py
+  - flake8 .
+script:
+  - python runtests.py
