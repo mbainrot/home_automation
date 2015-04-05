@@ -88,7 +88,8 @@ def handle_crontab(client, msg, smsg):
 
     strHour = str(now.hour)
     strMinute = str(now.minute)
-    strDow = now.strftime("%a").lower()
+    aDaysOfTheWeek = ("sunday", "monday", "tuesday", "wednesday", "thursday", "friday")
+    strDow = aDaysOfTheWeek[int(now.strftime("%w"))]
 
     if(now.hour < 10):
         strHour = '0' + strHour
@@ -96,11 +97,13 @@ def handle_crontab(client, msg, smsg):
     if(now.minute < 10):
         strMinute = '0' + strMinute
 
-    currentTimePath_a = config.working_dir +
+    currentTimePath_a = config.working_dir + \
     "/events/crontab/everyday/" + strHour + strMinute + "/"
 
-    currentTimePath_b = config.working_dir +
+    currentTimePath_b = config.working_dir + \
     "/events/crontab/" + strDow + "/" + strHour + strMinute + "/"
+
+    print("Current Day of the week is: " + strDow)  # FIXME: RM_DEBUG
 
     everycron = config.working_dir + "/events/crontab/everycron/"
 
