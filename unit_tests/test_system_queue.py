@@ -1,5 +1,13 @@
 #!/usr/bin/python
 
+# #########################################################
+# Unit Test: Test System Queue
+# Purpose: Tests whether the system queue works
+# Author: Max Bainrot (mbainrot)
+# Date: 5th April 2015
+# #########################################################
+
+
 import unittest
 import main
 import config

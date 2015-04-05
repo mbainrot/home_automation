@@ -1,5 +1,12 @@
 #!/usr/bin/python
 
+# #########################################################
+# Unit Test: Test If System Starts
+# Purpose: Tests whether the system even starts
+# Author: Max Bainrot (mbainrot)
+# Date: 5th April 2015
+# #########################################################
+
 import unittest
 import main
 
