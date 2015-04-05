@@ -1,0 +1,77 @@
+#!/usr/bin/python
+
+import unittest
+import main
+import config
+import threading
+import time
+
+# Extra stuff for mqtt
+import paho.mqtt.client as mqtt
+
+
+class test_system_queue(unittest.TestCase):
+    strData = ""
+    topic = ""
+    client = ""
+
+    def _on_message(self, client, userdata, msg):
+        self.strData = msg.payload.decode(encoding='ascii')
+
+    def _on_connect(self,client, userdata, flags, rc):
+        print("Connected with result code " + str(rc))
+        client.subscribe(self.topic)
+
+    def _maintain_mqtt(head,khead):
+        head.run = True
+        while head.run:
+            head.client.loop()
+
+    def setUp(self):
+        self.strData = ""
+
+        client = mqtt.Client()
+        self.client = client
+        self.topic = "sys_ack"
+        client.on_connect = self._on_connect
+        client.on_message = self._on_message
+
+        client.connect(config.mqtt_server, 1883, 60)
+
+        t = threading.Thread(target=self._maintain_mqtt,args=(self,))
+        t.start()
+
+
+        self.thread = t
+
+        self.thrd = main.fork_main()
+
+        # Test Specifc Stuff
+
+
+    def _send_delayed_message(self,delay,topic,message):
+        time.sleep(delay)
+        self.client.publish(topic,message)
+
+
+    def test_system_queue(self):
+        print("testing...")
+
+        kargs = {#'self': self,
+                 'topic': "sys",
+                 'message': "!unittest|4567",
+                 'delay': 0.1}
+
+        t = threading.Thread(target=self._send_delayed_message,kwargs=(kargs))
+        t.start()
+
+        while (self.strData == ""):
+            self.client.loop()
+
+        res = (self.strData == "!hello")
+
+        self.assertEqual(res,True, self.strData + " != '!hello'")
+
+    def tearDown(self):
+        self.run = False
+        self.client.disconnect()
