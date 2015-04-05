@@ -13,7 +13,6 @@ import os
 import time
 import datetime
 
-
 def handle_sys(client, msg):
     parts = msg.split("|")
     # Payload: sender_mac,dest_mac,device_id,device_state
@@ -34,7 +33,7 @@ def handle_sys(client, msg):
             client.publish("sys_" + dev_mac, "!ping|1234")
 
         if(command == "!unittest"):
-            client.publish("unittest","!hello")
+            client.publish("sys_ack","!hello")
 
 
 def handle_device_input(client, msg, smsg):
@@ -172,9 +171,7 @@ def on_connect(client, userdata, flags, rc):
 
 
 def on_message(client, userdata, msg):
-    newStr = str(msg.payload)
-    # newStr = newStr.replace("b'","")
-    newStr = newStr[2:-1]
+    newStr = msg.payload.decode(encoding='ascii')
 
     print("recv: topic=" + msg.topic + " payload=" + newStr)
 
@@ -199,10 +196,20 @@ def on_message(client, userdata, msg):
     else:  # Message we don't recognise...
         sVoid = ""  # FIXEME
 
-client = mqtt.Client()
-client.on_connect = on_connect
-client.on_message = on_message
+def main():
+    client = mqtt.Client()
+    client.on_connect = on_connect
+    client.on_message = on_message
 
-client.connect(config.mqtt_server, 1883, 60)
+    client.connect(config.mqtt_server, 1883, 60)
 
-client.loop_forever()
+    client.loop_forever()
+
+def fork_main():
+    t = threading.Thread(target=main,daemon=True)
+    t.start()
+    return t
+
+
+if __name__ == '__main__':
+    main()
