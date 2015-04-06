@@ -13,6 +13,10 @@ import os
 import time
 import datetime
 
+bRemoteKill = False
+bStop = False
+PollTimer = None
+
 def handle_sys(client, msg):
     parts = msg.split("|")
     # Payload: sender_mac,dest_mac,device_id,device_state
@@ -119,6 +123,10 @@ def handle_crontab(client, msg, smsg):
 
 
 def timer_poll_devices(client):
+    if(client.bStop == True):
+        print("Stopping the timer_poll_devices timer!")
+        return
+
     # do something here ...
     print("Polling all \"active\" devices!")
 
@@ -137,6 +145,7 @@ def timer_poll_devices(client):
                 client.publish("sys_" + sfile, "!ping|1234")
             else:
                 os.remove(dev_path + sfile)
+
 
     threading.Timer(10, timer_poll_devices, (client,)).start()
 
@@ -161,6 +170,10 @@ def on_connect(client, userdata, flags, rc):
 
     # Crontab
     client.subscribe("crontab")
+
+    # Remote kill (used for unittesting)
+    if client.bRemoteKill == True:
+        client.subscribe("abort")
 
     # Lifx
     client.subscribe("lifx")
@@ -193,23 +206,33 @@ def on_message(client, userdata, msg):
         handle_crontab(client, msg, newStr)
     elif(str(msg.topic) == "lifx"):
         lifx_controller.handle_lifx_message(client, msg, newStr)
+    elif(str(msg.topic) == "abort"):
+        print("RECEIVED KILL MESSAGE, DYING")
+        client.bStop = True
+        client.disconnect()
     else:  # Message we don't recognise...
         raise NotImplementedError()
 
-def main():
+def main(bRemoteKill):
     client = mqtt.Client()
+    client.bRemoteKill = bRemoteKill
+    client.bStop = False
+
     client.on_connect = on_connect
     client.on_message = on_message
 
     client.connect(config.mqtt_server, 1883, 60)
 
-    client.loop_forever()
+    while client.bStop == False:
+        client.loop()
+
+    print("Main loop stopped!")
 
 def fork_main():
-    t = threading.Thread(target=main,daemon=True)
+    t = threading.Thread(target=main,daemon=True,args=(True,))
     t.start()
     return t
 
 
 if __name__ == '__main__':
-    main()
+    main(True)
