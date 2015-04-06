@@ -68,13 +68,17 @@ class test_system_queue(unittest.TestCase):
         kargs = {#'self': self,
                  'topic': "sys",
                  'message': "!unittest|4567",
-                 'delay': 0.5}
+                 'delay': 1.0}
 
         t = threading.Thread(target=self._send_delayed_message,kwargs=(kargs))
         t.start()
 
+        abortts = int(time.time()) + 15
         while (self.strData == ""):
             self.client.loop()
+
+            if time.time() > abortts:
+                self.assertEqual(False,True,"Timed out")
 
         res = (self.strData == "!hello")
 
