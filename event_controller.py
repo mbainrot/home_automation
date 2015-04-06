@@ -1,12 +1,12 @@
 #!/usr/bin/python
 
-import config  # import our configuration
-import paho.mqtt.client as mqtt
+import config  # import our configuration  # noqa
+import paho.mqtt.client as mqtt  # noqa
 import os
 
 
 def invoke_mqtt(file):
-    strVoid = ""  # FIXME: BLOCKER
+    raise NotImplementedError()  # FIXME: BLOCKER
 
 
 def invoke_py(file):

@@ -36,27 +36,27 @@ def handle_sys(client, msg):
             client.publish("sys_ack","!hello")
 
 
-def handle_device_input(client, msg, smsg):
-    parts = smsg.split("|")
+def handle_device_input(client, msg, smsg):  # FIXME
+    parts = smsg.split("|")  # noqa
 
-    target_mac = str(msg.topic).replace("input_", "")
-
-
-def handle_device_output(client, msg, smsg):
-    parts = smsg.split("|")
-
-    target_mac = str(msg.topic).replace("output_", "")
+    target_mac = str(msg.topic).replace("input_", "")  # noqa
 
 
-def handle_device_sys(client, msg, smsg):
-    parts = smsg.split("|")
+def handle_device_output(client, msg, smsg):  # FIXME
+    parts = smsg.split("|")  # noqa
+
+    target_mac = str(msg.topic).replace("output_", "")  # noqa
+
+
+def handle_device_sys(client, msg, smsg):  # FIXME
+    parts = smsg.split("|")  # noqa
 
     target_mac = str(msg.topic).replace("sys_", "")
 
     if(smsg.startswith("!pong")):
         touch_arg = config.working_dir + "/devices/" + target_mac
 
-        res = subprocess.call(["touch", touch_arg])
+        subprocess.call(["touch", touch_arg])
 
 
 def createdir_ifnot_exist(dir):
@@ -78,14 +78,14 @@ def check_and_fix_crontab_dirs():
     createdir_ifnot_exist(config.working_dir + "/events/crontab/everycron/")
 
 
-def trigger_directory(dir):
-    strVoid = ""  # FIXME
+def trigger_directory(dir):  # FIXME
+    raise NotImplementedError()
 
 
 def handle_crontab(client, msg, smsg):
-    # This simply
+    # Setup our directories
     check_and_fix_crontab_dirs()
-    sVoid = ""
+
     now = datetime.datetime.now()
 
     strHour = str(now.hour)
@@ -118,7 +118,7 @@ def handle_crontab(client, msg, smsg):
     event_controller.process_event_folder(everycron)
 
 
-def timer_poll_devices():
+def timer_poll_devices(client):
     # do something here ...
     print("Polling all \"active\" devices!")
 
@@ -138,7 +138,7 @@ def timer_poll_devices():
             else:
                 os.remove(dev_path + sfile)
 
-    threading.Timer(10, timer_poll_devices).start()
+    threading.Timer(10, timer_poll_devices, (client,)).start()
 
 
 def on_connect(client, userdata, flags, rc):
@@ -165,7 +165,7 @@ def on_connect(client, userdata, flags, rc):
     # Lifx
     client.subscribe("lifx")
 
-    threading.Timer(10, timer_poll_devices).start()
+    threading.Timer(10, timer_poll_devices, (client,)).start()
 
     client.publish("sys", "!reregister")
 
@@ -176,17 +176,17 @@ def on_message(client, userdata, msg):
     print("recv: topic=" + msg.topic + " payload=" + newStr)
 
     if(msg.topic == "input"):  # generic input
-        sVoid = ""  # FIXME
+        raise NotImplementedError()  # FIXME
     elif(msg.topic == "input_ack"):  # Input req ACK
-        sVoid = ""  # FIXME
+        raise NotImplementedError()  # FIXME
     elif(msg.topic == "input_admin"):  # Administrative input
-        sVoid = ""  # FIXME
+        raise NotImplementedError()  # FIXME
     elif(msg.topic == "sys"):  # Generic system
         handle_sys(client, newStr)
     elif(msg.topic == "sys_hbeat"):  # System heartbeats (both client & server)
-        sVoid = ""  # FIXME
-    elif(msg.topic == "sys_ack"):  # System ack channel (n/a to server)
-        sVoid = ""  # FIXME
+        raise NotImplementedError()  # FIXME
+    # elif(msg.topic == "sys_ack"):  # System ack channel (n/a to server)
+    #    raise NotImplementedError()  # FIXME
     elif(str(msg.topic).startswith("sys_")):  # Device specific sys channel
         handle_device_sys(client, msg, newStr)
     elif(str(msg.topic) == "crontab"):
@@ -194,7 +194,7 @@ def on_message(client, userdata, msg):
     elif(str(msg.topic) == "lifx"):
         lifx_controller.handle_lifx_message(client, msg, newStr)
     else:  # Message we don't recognise...
-        sVoid = ""  # FIXEME
+        raise NotImplementedError()
 
 def main():
     client = mqtt.Client()
