@@ -16,6 +16,7 @@ import time
 
 # Extra stuff for mqtt
 import paho.mqtt.client as mqtt
+import paho.mqtt.publish as publish
 
 
 class test_system_queue(unittest.TestCase):
@@ -87,3 +88,9 @@ class test_system_queue(unittest.TestCase):
     def tearDown(self):
         self.run = False
         self.client.disconnect()
+
+        # Kill the server
+        publish.single("abort",payload="abort",hostname=config.mqtt_server,port=1883)
+
+        # Wait long enough for it to shrivel up and DIE
+        time.sleep(15)
