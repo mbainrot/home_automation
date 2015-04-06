@@ -12,6 +12,7 @@ import main
 
 import config
 import paho.mqtt.client as mqtt
+import paho.mqtt.publish as publish
 import threading
 import time
 
@@ -22,10 +23,7 @@ class test_device_reg(unittest.TestCase):
         self.mac_address = "DE:AD:BE:EF:FE:ED"  # Our fake mac address
 
 
-        # self.thrd = main.fork_main()  # Start the server
-
-
-
+        self.thrd = main.fork_main()  # Start the server
 
     def test_device_reg_step_1(self):
         c = test_device_reg_step_1(config,self.mac_address)
@@ -35,7 +33,11 @@ class test_device_reg(unittest.TestCase):
         self.assertEqual(True,res,res)
 
     def tearDown(self):
-        print()
+        # Kill the server
+        publish.single("abort",payload="abort",hostname=config.mqtt_server,port=1883)
+
+        # Wait long enough for it to shrivel up and DIE
+        time.sleep(15)
 
 
 class test_device_reg_step_1():
