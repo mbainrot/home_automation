@@ -43,9 +43,7 @@ def on_connect(client, userdata, flags, rc):
     client.publish("sys","!register|"+mac)
 
 def on_message(client, userdata, msg):
-    newStr = str(msg.payload)
-    # newStr = newStr.replace("b'","")
-    newStr = newStr[2:-1]
+    newStr = msg.payload.decode(encoding='ascii')
 
     print("recv: topic=" + msg.topic + " payload=" + newStr)
 
