@@ -60,25 +60,39 @@ def handle_lifx_message(client, msg, smsg):
 
     cmd = parts[0]
 
+    # No parts
+    if(cmd == "!list_lights"):
+        raise NotImplementedError()  # FIXME
+
     # parts == 2
     if(len(parts) == 2):
-        if(cmd == "turn_on"):  # !turn_on,light_id
+        if(cmd == "!turn_on"):  # !turn_on,light_id
             light_id = parts[1]
             print(_lifx_json_put("/lights/id:" +
                                  light_id + "/power",
                                  "state=on&duration=0.0"))
 
-        if(cmd == "turn_off"):  # !turn_off,light_id
+        if(cmd == "!turn_off"):  # !turn_off,light_id
             light_id = parts[1]
             print(_lifx_json_put("/lights/id:" +
                                  light_id + "/power",
                                  "state=off&duration=0.0"))
 
     if(len(parts) == 3):
-        if(cmd == "set_brightness"):  # !turn_off,light_id
+        if(cmd == "!set_brightness"):  # !turn_off,light_id
             light_id = parts[1]
             brightness = parts[2]
             print(_lifx_json_put("/lights/id:" +
                                  light_id + "/color",
                                  "power_on=false&duration=0.0" +
+                                 "&color=brightness:" + brightness))
+
+    if(len(parts) == 4):
+        if(cmd == "!set_brightness_ext"):  # !turn_off,light_id
+            light_id = parts[1]
+            brightness = parts[2]
+            duration = parts[3]
+            print(_lifx_json_put("/lights/id:" +
+                                 light_id + "/color",
+                                 "power_on=false&duration=" + duration +
                                  "&color=brightness:" + brightness))
