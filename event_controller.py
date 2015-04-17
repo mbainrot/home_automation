@@ -31,8 +31,8 @@ def invoke_mqtt(file):
                 strBody = strBody[:-1]
 
                 # FIXME: Put under debug switch to minimise shit in STDOUT
-                print('Got message to send to "'+topic+'" is as follows:')
-                print(strBody)
+                # print('Got message to send to "'+topic+'" is as follows:')
+                # print(strBody)
 
                 client.publish(topic,strBody)
 

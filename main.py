@@ -169,6 +169,9 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("output_ack")  # ack output channel
     client.subscribe("output_admin")  # admin output channel???
 
+    # Custom
+    client.subscribe("custom")
+
     # Crontab
     client.subscribe("crontab")
 
@@ -183,6 +186,14 @@ def on_connect(client, userdata, flags, rc):
 
     client.publish("sys", "!reregister")
 
+
+def handle_custom(client,msg,smsg):
+    tempPath = config.working_dir + "/events/custom/" + smsg
+
+    if(os.path.exists(tempPath) == False):
+        return
+
+    event_controller.process_event_folder(tempPath)
 
 def on_message(client, userdata, msg):
     newStr = msg.payload.decode(encoding='ascii')
@@ -203,6 +214,8 @@ def on_message(client, userdata, msg):
     #    raise NotImplementedError()  # FIXME
     elif(str(msg.topic).startswith("sys_")):  # Device specific sys channel
         handle_device_sys(client, msg, newStr)
+    elif(str(msg.topic) == "custom"):
+        handle_custom(client, msg, newStr)
     elif(str(msg.topic) == "crontab"):
         handle_crontab(client, msg, newStr)
     elif(str(msg.topic) == "lifx"):

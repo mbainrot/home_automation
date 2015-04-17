@@ -15,7 +15,7 @@ Events enable the chaining and grouping of commands for example, say we had a se
 
 events/DE:AD:BE:EF:FE:ED/switch1/pressed/someMeaningfulFilename.mqtt:
 '''
-input|custom|turn_on_all_lights
+custom|turn_on_all_lights
 '''
 
 This will trigger an input event, to fire the custom event "turn_on_all_lights"
