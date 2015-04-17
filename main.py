@@ -82,8 +82,9 @@ def check_and_fix_crontab_dirs():
     createdir_ifnot_exist(config.working_dir + "/events/crontab/everycron/")
 
 
-def trigger_directory(dir):  # FIXME
-    raise NotImplementedError()
+def check_and_fix_event_dirs():
+    createdir_ifnot_exist(config.working_dir + "/events/")
+    createdir_ifnot_exist(config.working_dir + "/events/custom/")
 
 
 def handle_crontab(client, msg, smsg):
@@ -214,6 +215,9 @@ def on_message(client, userdata, msg):
         raise NotImplementedError()
 
 def main(bRemoteKill):
+    check_and_fix_event_dirs()
+    check_and_fix_crontab_dirs()
+
     client = mqtt.Client()
     client.bRemoteKill = bRemoteKill
     client.bStop = False
