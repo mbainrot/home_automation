@@ -5,6 +5,7 @@
 # Purpose: Tests whether a given device can register
 # Author: Max Bainrot (mbainrot)
 # Date: 6th April 2015
+# Test Detail:
 # #########################################################
 
 import unittest
@@ -20,7 +21,7 @@ class test_device_reg(unittest.TestCase):
 
     def setUp(self):
         # Setup our variables
-        self.mac_address = "DE:AD:BE:EF:FE:ED"  # Our fake mac address
+        self.mac_address = "DE:AD:BE:EF:CA:DE"  # Our fake mac address
 
 
         self.thrd = main.fork_main()  # Start the server
@@ -65,6 +66,9 @@ class test_device_reg_step_1():
             client.loop()
 
         # Compute and return result here :)
+        if(not os.path.exists(config.working_dir + '/devices/' + self.mac_address)):
+            return (False,"Failed to create devices file")
+
         return True
 
     def on_connect(self, client, userdata, flags, rc):

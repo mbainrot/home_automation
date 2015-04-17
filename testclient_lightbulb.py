@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import config # import our configuration
+import config  # import our configuration
 
 import paho.mqtt.client as mqtt
 
@@ -15,12 +15,12 @@ targeted_inp_ch = "input_" + mac
 targeted_out_ch = "output_" + mac
 
 
-
 def handle_sys(client,msg):
     parts = msg.split("|")  # FIXME (finish implementation)  # noqa
 
     if(msg == "!reregister"):
-        client.publish("sys","!register|"+mac)
+        client.publish("sys", "!register|"+mac)
+
 
 def handle_targeted_sys(client,msg):
     parts = msg.split("|")
@@ -34,13 +34,12 @@ def handle_targeted_sys(client,msg):
         client.subscribe(targeted_inp_ch)
         client.subscribe(targeted_out_ch)
 
-
-
     if(len(parts) == 2):
         cmd,arg = parts
 
         if(cmd == "!ping"):
-            client.publish(targeted_sys_ch,"!pong|"+arg)
+            client.publish(targeted_sys_ch, "!pong|"+arg)
+
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code " + str(rc))
@@ -48,7 +47,8 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("sys")
     client.subscribe(targeted_sys_ch)
 
-    client.publish("sys","!register|"+mac)
+    client.publish("sys", "!register|"+mac)
+
 
 def on_message(client, userdata, msg):
     newStr = msg.payload.decode(encoding='ascii')
@@ -64,7 +64,8 @@ def on_message(client, userdata, msg):
     else: # Message we don't recognise...
         strVoid = ""
 
-def handle_targeted_output(client,msg,smsg):
+
+def handle_targeted_output(client, msg, smsg):
     parts = smsg.split("|")
 
     # expected msg = component|cmd
@@ -97,11 +98,13 @@ def handle_targeted_output(client,msg,smsg):
             if(component == "bulb4"):
                 client.bulb_4 = 0
 
+
 def _maintain_mqtt():
     while client.run:
         # os.system('clear')
 
         client.loop()
+
 
 def _update_gui():
     while client.run:
@@ -109,27 +112,28 @@ def _update_gui():
         render_lightbulbs()
         time.sleep(0.5)
 
+
 def render_lightbulbs():
     for n in range(0,4):
         if(client.bulb_1 == 1):
-            print(" ###### ",end="")
+            print(" ###### ", end="")
         else:
-            print("        ",end="")
+            print("        ", end="")
 
         if(client.bulb_2 == 1):
-            print(" ###### ",end="")
+            print(" ###### ", end="")
         else:
-            print("        ",end="")
+            print("        ", end="")
 
         if(client.bulb_3 == 1):
-            print(" ###### ",end="")
+            print(" ###### ", end="")
         else:
-            print("        ",end="")
+            print("        ", end="")
 
         if(client.bulb_4 == 1):
-            print(" ###### ",end="")
+            print(" ###### ", end="")
         else:
-            print("        ",end="")
+            print("        ", end="")
 
         print("")
 
@@ -151,7 +155,7 @@ client.bulb_2 = 1
 client.bulb_3 =1
 client.bulb_4 = 1
 
-client.connect(config.mqtt_server,1883,60)
+client.connect(config.mqtt_server, 1883, 60)
 
 t = threading.Thread(target=_maintain_mqtt)
 t.start()

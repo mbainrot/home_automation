@@ -3,15 +3,16 @@
 import config  # import our configuration  # noqa
 import paho.mqtt.client as mqtt  # noqa
 import os
-import io
 
 
 def invoke_mqtt(file):
-    if(os.path.exists(file) == False):
-        print('ERROR - event controller - mqtt file ' + file + ' does not exist!')
+    if(os.path.exists(file) is False):
+        print('ERROR - event controller - mqtt file ' + file +
+              ' does not exist!')
 
-    # Initiate connection to MQTT server in preparation to be sending some messages
-    with open(file,'r') as f:
+    # Initiate connection to MQTT server in preparation to be
+    # sending some messages
+    with open(file, 'r') as f:
         for sLine in f.readlines():
             parts = sLine.split('|')
 
@@ -23,7 +24,7 @@ def invoke_mqtt(file):
                 for part in body:
                     strBody += part + "|"
 
-                strBody = strBody.replace("\n","")
+                strBody = strBody.replace("\n", "")
                 strBody = strBody[:-1]
 
                 # FIXME: Put under debug switch to minimise shit in STDOUT
@@ -31,10 +32,11 @@ def invoke_mqtt(file):
                 # print(strBody)
                 client = mqtt.Client()
                 client.connect(config.mqtt_server, 1883, 60)
-                client.publish(topic,strBody)
+                client.publish(topic, strBody)
                 client.disconnect()
 
         f.close()
+
 
 def invoke_py(file):
     if(os.path.exists(file)):
