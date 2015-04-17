@@ -14,35 +14,30 @@ def invoke_mqtt(file):
     client = mqtt.Client()
     client.connect(config.mqtt_server, 1883, 60)
 
-    f = io.open(file,'r')
 
-    sLine = 'prebuff'
+    with open(file,'r') as f:
+        for sLine in f:
+            parts = sLine.split('|')
 
-    while (sLine != ''):
-        sLine = f.readline()
+            if(len(parts) >= 2):
+                topic = parts[0]
+                body = parts[1:]
 
-        parts = sLine.split('|')
+                strBody = ""
+                for part in body:
+                    strBody += part + "|"
 
-        if(len(parts) >= 2):
-            topic = parts[0]
-            body = parts[1:]
+                strBody = strBody.replace("\n","")
+                strBody = strBody[:-1]
 
-            strBody = ""
-            for part in body:
-                strBody += part + "|"
+                # FIXME: Put under debug switch to minimise shit in STDOUT
+                print('Got message to send to "'+topic+'" is as follows:')
+                print(strBody)
 
-            strBody = strBody.replace("\n","")
-            strBody = strBody[:-1]
+                client.publish(topic,strBody)
 
-            # FIXME: Put under debug switch to minimise shit in STDOUT
-            print('Got message to send to "'+topic+'" is as follows:')
-            print(strBody)
+        f.close()
 
-            client.publish(topic,strBody)
-
-
-
-    f.close()
     # We're done singing the song of our people, close our connection!
     client.disconnect()
 
