@@ -204,8 +204,6 @@ def on_connect(client, userdata, flags, rc):
 
     # Input channels (device -> server)
     client.subscribe("input")  # Generic input channel
-    client.subscribe("input_ack")  # ack input channel
-    client.subscribe("input_admin")  # Administrative input channel
 
     # System Channels (any <> any)
     client.subscribe("sys")  # Generic system channel
@@ -214,8 +212,6 @@ def on_connect(client, userdata, flags, rc):
 
     # Output channels (server -> device)
     client.subscribe("output")  # Generic output channel
-    client.subscribe("output_ack")  # ack output channel
-    client.subscribe("output_admin")  # admin output channel???
 
     # Custom
     client.subscribe("custom")
@@ -250,10 +246,6 @@ def on_message(client, userdata, msg):
 
     if(msg.topic == "input"):  # generic input
         handle_input(client, msg, newStr)
-    elif(msg.topic == "input_ack"):  # Input req ACK
-        raise NotImplementedError()  # FIXME
-    elif(msg.topic == "input_admin"):  # Administrative input
-        raise NotImplementedError()  # FIXME
     elif(msg.topic == "sys"):  # Generic system
         handle_sys(client, newStr)
     elif(msg.topic == "sys_hbeat"):  # System heartbeats (both client & server)

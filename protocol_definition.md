@@ -21,3 +21,5 @@ When the server starts up it sends out a command to !reregister which causes all
 ## Input Devices ##
 When an input device endures an event it will send the following
 client -> server (input_~mac~): component|event
+
+At this point in time I have not implemented acknowledged events so the message could get missed
