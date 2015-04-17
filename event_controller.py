@@ -3,10 +3,41 @@
 import config  # import our configuration  # noqa
 import paho.mqtt.client as mqtt  # noqa
 import os
+import io
 
 
 def invoke_mqtt(file):
-    raise NotImplementedError()  # FIXME: BLOCKER
+    if(os.path.exists(file) == False):
+        print('ERROR - event controller - mqtt file ' + file + ' does not exist!')
+
+    f = io.open(file,'r')
+
+    sLine = 'prebuff'
+
+    while (sLine != ''):
+        sLine = f.readline()
+
+        parts = sLine.split('|')
+
+        if(len(parts) >= 2):
+            topic = parts[0]
+            body = parts[1:]
+
+            strBody = ""
+            for part in body:
+                strBody += part + "|"
+
+            strBody = strBody.replace("\n","")
+            strBody = strBody[:-1]
+
+            # FIXME: Put under debug switch to minimise shit in STDOUT
+            print('Got message to send to "'+topic+'" is as follows:')
+            print(strBody)
+
+
+
+    f.close()
+
 
 
 def invoke_py(file):
