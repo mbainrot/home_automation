@@ -11,12 +11,8 @@ def invoke_mqtt(file):
         print('ERROR - event controller - mqtt file ' + file + ' does not exist!')
 
     # Initiate connection to MQTT server in preparation to be sending some messages
-    client = mqtt.Client()
-    client.connect(config.mqtt_server, 1883, 60)
-
-
     with open(file,'r') as f:
-        for sLine in f:
+        for sLine in f.readlines():
             parts = sLine.split('|')
 
             if(len(parts) >= 2):
@@ -33,15 +29,12 @@ def invoke_mqtt(file):
                 # FIXME: Put under debug switch to minimise shit in STDOUT
                 # print('Got message to send to "'+topic+'" is as follows:')
                 # print(strBody)
-
+                client = mqtt.Client()
+                client.connect(config.mqtt_server, 1883, 60)
                 client.publish(topic,strBody)
+                client.disconnect()
 
         f.close()
-
-    # We're done singing the song of our people, close our connection!
-    client.disconnect()
-
-
 
 def invoke_py(file):
     if(os.path.exists(file)):

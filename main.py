@@ -10,6 +10,7 @@ import paho.mqtt.client as mqtt
 import subprocess
 import threading
 import os
+import io
 import time
 import datetime
 
@@ -27,24 +28,52 @@ def handle_sys(client, msg):
         if(command == "!register"):
             dev_mac = arg0
 
-            client.subscribe("sys_" + arg0)
+            client.subscribe("input_" + dev_mac)
+            client.subscribe("sys_" + dev_mac)
 
-            # FIXME
-            print("I am meant to record the devices registration here!")
-            # FIXME
+            # FIXME: These are debugs!
+            client.subscribe("output_" + dev_mac)
 
+            # Respond to the client's registeration
             client.publish("sys_" + dev_mac, "!registered")
+            client.publish("sys_" + dev_mac, "!send_caps")
             client.publish("sys_" + dev_mac, "!ping|1234")
 
         if(command == "!unittest"):
             client.publish("sys_ack","!hello")
 
 
-def handle_device_input(client, msg, smsg):  # FIXME
+def handle_input(client, msg, smsg):  # FIXME
     parts = smsg.split("|")  # noqa
 
-    target_mac = str(msg.topic).replace("input_", "")  # noqa
+    if(len(parts) != 4):
+        return
 
+    sender_mac = parts[0]
+    dest_mac = parts[1]
+    component = parts[2]
+    event = parts[3]
+
+    tempPath = config.working_dir + "/events/" + sender_mac + "/" + component + "/" + event
+
+    if(os.path.exists(tempPath)):
+        event_controller.process_event_folder(tempPath)
+
+def handle_targeted_input(client, msg, smsg):  # FIXME
+    parts = smsg.split("|")  # noqa
+
+    sender_mac = msg.topic.replace("input_","")
+
+    if(len(parts) != 2):
+        return
+
+    component = parts[0]
+    event = parts[1]
+
+    tempPath = config.working_dir + "/events/" + sender_mac + "/" + component + "/" + event
+
+    if(os.path.exists(tempPath)):
+        event_controller.process_event_folder(tempPath)
 
 def handle_device_output(client, msg, smsg):  # FIXME
     parts = smsg.split("|")  # noqa
@@ -62,10 +91,29 @@ def handle_device_sys(client, msg, smsg):  # FIXME
 
         subprocess.call(["touch", touch_arg])
 
+    if(smsg.startswith("!capability") and len(parts) == 3):
+        component = parts[1]
+        event = parts[2]
+
+        basedir = config.working_dir + "/events/" + target_mac.upper()
+
+        createdir_ifnot_exist(basedir)
+        createdir_ifnot_exist(basedir + "/" + component)
+        createdir_ifnot_exist(basedir + "/" + component + "/" + event)
+
 
 def createdir_ifnot_exist(dir):
     if(os.path.exists(dir) is False):
         os.mkdir(dir)
+
+def createfile_ifnot_exist(file):
+    if(os.path.exists(file) is False):
+        touch_file(file)
+
+def touch_file(sFile):
+    f = open(sFile,'w')
+    f.write("")
+    f.close()
 
 
 def check_and_fix_crontab_dirs():
@@ -201,7 +249,7 @@ def on_message(client, userdata, msg):
     print("recv: topic=" + msg.topic + " payload=" + newStr)
 
     if(msg.topic == "input"):  # generic input
-        raise NotImplementedError()  # FIXME
+        handle_input(client, msg, newStr)
     elif(msg.topic == "input_ack"):  # Input req ACK
         raise NotImplementedError()  # FIXME
     elif(msg.topic == "input_admin"):  # Administrative input
@@ -214,6 +262,8 @@ def on_message(client, userdata, msg):
     #    raise NotImplementedError()  # FIXME
     elif(str(msg.topic).startswith("sys_")):  # Device specific sys channel
         handle_device_sys(client, msg, newStr)
+    elif(str(msg.topic).startswith("input_")):
+        handle_targeted_input(client, msg, newStr)
     elif(str(msg.topic) == "custom"):
         handle_custom(client, msg, newStr)
     elif(str(msg.topic) == "crontab"):
@@ -225,7 +275,7 @@ def on_message(client, userdata, msg):
         client.bStop = True
         client.disconnect()
     else:  # Message we don't recognise...
-        raise NotImplementedError()
+        strVoid = ""
 
 def main(bRemoteKill):
     check_and_fix_event_dirs()
