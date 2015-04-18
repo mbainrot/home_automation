@@ -11,35 +11,35 @@
 # #########################################################
 
 import unittest
-import main
 
 import flake8.main
 import os
+
 
 class test_flake_pep_compliance(unittest.TestCase):
 
     def setUp(self):
         self.files = ()
 
-        searchPath = os.path.dirname(os.path.realpath(__file__))+ '/../'
+        searchPath = os.path.dirname(os.path.realpath(__file__)) + '/../'
 
         for file in os.listdir(searchPath):
             if file.endswith(".py"):
                 self.files += (file,)
 
-        print("I have a total of " + str(len(self.files)) + " file(s) to process")
+        print("I have a total of " + str(len(self.files)) +
+              " file(s) to process")
 
     def test_compliance(self):
         for file in self.files:
             print("Checking file: " + file)
-            res = flake8.main.check_file(file,ignore=('E501'))
+            res = flake8.main.check_file(file, ignore=('E501'))
 
             if res > 0:
                 strErrorBuffer = "\n"
                 strErrorBuffer += "File: \"" + file + "\" failed with " + \
                                   str(res) + " validation errors" + "\n"
-                self.assertEqual(True,False,strErrorBuffer)
-
+                self.assertEqual(True, False, strErrorBuffer)
 
     def tearDown(self):
-        strVoid = ""
+        strVoid = ""  # noqa

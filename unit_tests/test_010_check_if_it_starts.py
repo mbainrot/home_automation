@@ -14,6 +14,7 @@ import config
 import paho.mqtt.publish as publish
 import time
 
+
 class test_startup(unittest.TestCase):
 
     def setUp(self):
@@ -22,14 +23,12 @@ class test_startup(unittest.TestCase):
     def test_startup(self):
         self.thrd = main.fork_main()
 
-        self.assertEqual(self.thrd.is_alive(),True)
+        self.assertEqual(self.thrd.is_alive(), True)
 
     def tearDown(self):
         # Kill the server
-        publish.single("abort",payload="abort",hostname=config.mqtt_server,port=1883)
+        publish.single("abort", payload="abort", hostname=config.mqtt_server,
+                       port=1883)
 
         # Wait long enough for it to shrivel up and DIE
         time.sleep(15)
-
-
-
