@@ -27,11 +27,11 @@ class test_system_queue(unittest.TestCase):
     def _on_message(self, client, userdata, msg):
         self.strData = msg.payload.decode(encoding='ascii')
 
-    def _on_connect(self,client, userdata, flags, rc):
+    def _on_connect(self, client, userdata, flags, rc):
         print("Connected with result code " + str(rc))
         client.subscribe(self.topic)
 
-    def _maintain_mqtt(head,khead):
+    def _maintain_mqtt(head, khead):
         head.run = True
         while head.run:
             head.client.loop()
@@ -47,9 +47,8 @@ class test_system_queue(unittest.TestCase):
 
         client.connect(config.mqtt_server, 1883, 60)
 
-        t = threading.Thread(target=self._maintain_mqtt,args=(self,))
+        t = threading.Thread(target=self._maintain_mqtt, args=(self,))
         t.start()
-
 
         self.thread = t
 
@@ -57,21 +56,18 @@ class test_system_queue(unittest.TestCase):
 
         # Test Specifc Stuff
 
-
-    def _send_delayed_message(self,delay,topic,message):
+    def _send_delayed_message(self, delay, topic, message):
         time.sleep(delay)
-        self.client.publish(topic,message)
-
+        self.client.publish(topic, message)
 
     def test_system_queue(self):
         print("testing...")
 
-        kargs = {#'self': self,
-                 'topic': "sys",
+        kargs = {'topic': "sys",  # 'self': self,
                  'message': "!unittest|4567",
                  'delay': 1.0}
 
-        t = threading.Thread(target=self._send_delayed_message,kwargs=(kargs))
+        t = threading.Thread(target=self._send_delayed_message, kwargs=(kargs))
         t.start()
 
         abortts = int(time.time()) + 15
@@ -79,18 +75,19 @@ class test_system_queue(unittest.TestCase):
             self.client.loop()
 
             if time.time() > abortts:
-                self.assertEqual(False,True,"Timed out")
+                self.assertEqual(False, True, "Timed out")
 
         res = (self.strData == "!hello")
 
-        self.assertEqual(res,True, self.strData + " != '!hello'")
+        self.assertEqual(res, True, self.strData + " != '!hello'")
 
     def tearDown(self):
         self.run = False
         self.client.disconnect()
 
         # Kill the server
-        publish.single("abort",payload="abort",hostname=config.mqtt_server,port=1883)
+        publish.single("abort", payload="abort", hostname=config.mqtt_server,
+                       port=1883)
 
         # Wait long enough for it to shrivel up and DIE
         time.sleep(15)

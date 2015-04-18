@@ -18,6 +18,7 @@ import threading
 import time
 import os
 
+
 class test_device_reg(unittest.TestCase):
 
     def setUp(self):
@@ -32,15 +33,16 @@ class test_device_reg(unittest.TestCase):
         self.thrd = main.fork_main()  # Start the server
 
     def test_device_reg_step_1(self):
-        c = test_device_reg_step_1(config,self.mac_address)
+        c = test_device_reg_step_1(config, self.mac_address)
 
         res = c.start()
 
-        self.assertEqual(True,res,res)
+        self.assertEqual(True, res, res)
 
     def tearDown(self):
         # Kill the server
-        publish.single("abort",payload="abort",hostname=config.mqtt_server,port=1883)
+        publish.single("abort", payload="abort", hostname=config.mqtt_server,
+                       port=1883)
 
         # Wait long enough for it to shrivel up and DIE
         time.sleep(15)
@@ -63,7 +65,7 @@ class test_device_reg_step_1():
         client.on_connect = self.on_connect
         client.on_message = self.on_message
 
-        client.connect(config.mqtt_server,1883,60)
+        client.connect(config.mqtt_server, 1883, 60)
 
         self.client = client
 
@@ -71,8 +73,9 @@ class test_device_reg_step_1():
             client.loop()
 
         # Compute and return result here :)
-        if(not os.path.exists(config.working_dir + '/devices/' + self.mac_address)):
-            return (False,"Failed to create devices file")
+        if(not os.path.exists(config.working_dir + '/devices/' +
+           self.mac_address)):
+            return (False, "Failed to create devices file")
 
         return True
 
@@ -82,7 +85,7 @@ class test_device_reg_step_1():
         client.subscribe("sys")
         client.subscribe(self.targeted_sys)
 
-        client.publish("sys","!register|"+ self.mac_address)
+        client.publish("sys", "!register|" + self.mac_address)
 
     def on_message(self, client, userdata, msg):
         newStr = msg.payload.decode(encoding='ascii')
@@ -90,19 +93,19 @@ class test_device_reg_step_1():
         print("recv: topic=" + msg.topic + " payload=" + newStr)
 
         if(msg.topic == "sys"):
-            self.handle_sys(client,newStr)
+            self.handle_sys(client, newStr)
         elif(msg.topic == self.targeted_sys):
-            self.handle_targeted_sys(client,newStr)
-        else: # Message we don't recognise...
+            self.handle_targeted_sys(client, newStr)
+        else:  # Message we don't recognise...
             raise NotImplementedError()
 
-    def handle_sys(self,client,msg):
+    def handle_sys(self, client, msg):
         parts = msg.split("|")  # FIXME (finish implementation)  # noqa
 
         if(msg == "!reregister"):
-            client.publish("sys","!register|"+self.mac_address)
+            client.publish("sys", "!register|" + self.mac_address)
 
-    def handle_targeted_sys(self,client,msg):
+    def handle_targeted_sys(self, client, msg):
         parts = msg.split("|")
 
         if(msg == "!registered"):
@@ -114,15 +117,13 @@ class test_device_reg_step_1():
             # client.subscribe(targeted_inp_ch)
             # client.subscribe(targeted_out_ch)
 
-
             threading.Timer(10, self.timer_bStop).start()
 
         if(len(parts) == 2):
-            cmd,arg = parts
+            cmd, arg = parts
 
             if(cmd == "!ping"):
-                client.publish(self.targeted_sys,"!pong|"+arg)
+                client.publish(self.targeted_sys, "!pong|" + arg)
 
     def timer_bStop(self):
         self.bStop = True
-
