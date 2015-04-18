@@ -16,6 +16,7 @@ import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 import threading
 import time
+import os
 
 class test_device_reg(unittest.TestCase):
 
@@ -23,6 +24,10 @@ class test_device_reg(unittest.TestCase):
         # Setup our variables
         self.mac_address = "DE:AD:BE:EF:CA:DE"  # Our fake mac address
 
+        deviceFile = config.working_dir + '/devices/' + self.mac_address
+
+        if(os.path.exists(deviceFile)):
+            os.rm(deviceFile)
 
         self.thrd = main.fork_main()  # Start the server
 
@@ -109,10 +114,15 @@ class test_device_reg_step_1():
             # client.subscribe(targeted_inp_ch)
             # client.subscribe(targeted_out_ch)
 
-            self.bStop = True
+
+            threading.Timer(10, self.timer_bStop).start()
 
         if(len(parts) == 2):
             cmd,arg = parts
 
             if(cmd == "!ping"):
                 client.publish(self.targeted_sys,"!pong|"+arg)
+
+    def timer_bStop(self):
+        self.bStop = True
+

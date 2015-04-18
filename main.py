@@ -10,13 +10,14 @@ import paho.mqtt.client as mqtt
 import subprocess
 import threading
 import os
-import io
+# import io
 import time
 import datetime
 
 bRemoteKill = False
 bStop = False
 PollTimer = None
+
 
 def handle_sys(client, msg):
     parts = msg.split("|")
@@ -40,7 +41,7 @@ def handle_sys(client, msg):
             client.publish("sys_" + dev_mac, "!ping|1234")
 
         if(command == "!unittest"):
-            client.publish("sys_ack","!hello")
+            client.publish("sys_ack", "!hello")
 
 
 def handle_input(client, msg, smsg):  # FIXME
@@ -50,19 +51,21 @@ def handle_input(client, msg, smsg):  # FIXME
         return
 
     sender_mac = parts[0]
-    dest_mac = parts[1]
+    # dest_mac = parts[1]
     component = parts[2]
     event = parts[3]
 
-    tempPath = config.working_dir + "/events/" + sender_mac + "/" + component + "/" + event
+    tempPath = config.working_dir + "/events/" + sender_mac + "/" + \
+        component + "/" + event
 
     if(os.path.exists(tempPath)):
         event_controller.process_event_folder(tempPath)
 
+
 def handle_targeted_input(client, msg, smsg):  # FIXME
     parts = smsg.split("|")  # noqa
 
-    sender_mac = msg.topic.replace("input_","")
+    sender_mac = msg.topic.replace("input_", "")
 
     if(len(parts) != 2):
         return
@@ -70,10 +73,12 @@ def handle_targeted_input(client, msg, smsg):  # FIXME
     component = parts[0]
     event = parts[1]
 
-    tempPath = config.working_dir + "/events/" + sender_mac + "/" + component + "/" + event
+    tempPath = config.working_dir + "/events/" + sender_mac + "/" + \
+        component + "/" + event
 
     if(os.path.exists(tempPath)):
         event_controller.process_event_folder(tempPath)
+
 
 def handle_device_output(client, msg, smsg):  # FIXME
     parts = smsg.split("|")  # noqa
@@ -106,12 +111,14 @@ def createdir_ifnot_exist(dir):
     if(os.path.exists(dir) is False):
         os.mkdir(dir)
 
+
 def createfile_ifnot_exist(file):
     if(os.path.exists(file) is False):
         touch_file(file)
 
+
 def touch_file(sFile):
-    f = open(sFile,'w')
+    f = open(sFile, 'w')
     f.write("")
     f.close()
 
@@ -143,7 +150,8 @@ def handle_crontab(client, msg, smsg):
 
     strHour = str(now.hour)
     strMinute = str(now.minute)
-    aDaysOfTheWeek = ("sunday", "monday", "tuesday", "wednesday", "thursday", "friday")
+    aDaysOfTheWeek = ("sunday", "monday", "tuesday", "wednesday",
+                      "thursday", "friday")
     strDow = aDaysOfTheWeek[int(now.strftime("%w"))]
 
     if(now.hour < 10):
@@ -153,10 +161,10 @@ def handle_crontab(client, msg, smsg):
         strMinute = '0' + strMinute
 
     currentTimePath_a = config.working_dir + \
-    "/events/crontab/everyday/" + strHour + strMinute + "/"
+        "/events/crontab/everyday/" + strHour + strMinute + "/"
 
     currentTimePath_b = config.working_dir + \
-    "/events/crontab/" + strDow + "/" + strHour + strMinute + "/"
+        "/events/crontab/" + strDow + "/" + strHour + strMinute + "/"
 
     print("Current Day of the week is: " + strDow)  # FIXME: RM_DEBUG
 
@@ -172,7 +180,7 @@ def handle_crontab(client, msg, smsg):
 
 
 def timer_poll_devices(client):
-    if(client.bStop == True):
+    if(client.bStop is True):
         print("Stopping the timer_poll_devices timer!")
         return
 
@@ -194,7 +202,6 @@ def timer_poll_devices(client):
                 client.publish("sys_" + sfile, "!ping|1234")
             else:
                 os.remove(dev_path + sfile)
-
 
     threading.Timer(10, timer_poll_devices, (client,)).start()
 
@@ -220,7 +227,7 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("crontab")
 
     # Remote kill (used for unittesting)
-    if client.bRemoteKill == True:
+    if client.bRemoteKill is True:
         client.subscribe("abort")
 
     # Lifx
@@ -231,13 +238,14 @@ def on_connect(client, userdata, flags, rc):
     client.publish("sys", "!reregister")
 
 
-def handle_custom(client,msg,smsg):
+def handle_custom(client, msg, smsg):
     tempPath = config.working_dir + "/events/custom/" + smsg
 
-    if(os.path.exists(tempPath) == False):
+    if(os.path.exists(tempPath) is False):
         return
 
     event_controller.process_event_folder(tempPath)
+
 
 def on_message(client, userdata, msg):
     newStr = msg.payload.decode(encoding='ascii')
@@ -267,7 +275,8 @@ def on_message(client, userdata, msg):
         client.bStop = True
         client.disconnect()
     else:  # Message we don't recognise...
-        strVoid = ""
+        strVoid = ""  # noqa
+
 
 def main(bRemoteKill):
     check_and_fix_event_dirs()
@@ -282,13 +291,14 @@ def main(bRemoteKill):
 
     client.connect(config.mqtt_server, 1883, 60)
 
-    while client.bStop == False:
+    while client.bStop is False:
         client.loop()
 
     print("Main loop stopped!")
 
+
 def fork_main():
-    t = threading.Thread(target=main,daemon=True,args=(True,))
+    t = threading.Thread(target=main, daemon=True, args=(True,))
     t.start()
     return t
 

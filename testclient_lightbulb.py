@@ -15,14 +15,14 @@ targeted_inp_ch = "input_" + mac
 targeted_out_ch = "output_" + mac
 
 
-def handle_sys(client,msg):
+def handle_sys(client, msg):
     parts = msg.split("|")  # FIXME (finish implementation)  # noqa
 
     if(msg == "!reregister"):
         client.publish("sys", "!register|"+mac)
 
 
-def handle_targeted_sys(client,msg):
+def handle_targeted_sys(client, msg):
     parts = msg.split("|")
 
     if(msg == "!registered"):
@@ -35,7 +35,7 @@ def handle_targeted_sys(client,msg):
         client.subscribe(targeted_out_ch)
 
     if(len(parts) == 2):
-        cmd,arg = parts
+        cmd, arg = parts
 
         if(cmd == "!ping"):
             client.publish(targeted_sys_ch, "!pong|"+arg)
@@ -53,16 +53,16 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     newStr = msg.payload.decode(encoding='ascii')
 
-    #print("recv: topic=" + msg.topic + " payload=" + newStr)
+    # print("recv: topic=" + msg.topic + " payload=" + newStr)
 
     if(msg.topic == "sys"):
-        handle_sys(client,newStr)
+        handle_sys(client, newStr)
     elif(msg.topic == targeted_sys_ch):
-        handle_targeted_sys(client,newStr)
+        handle_targeted_sys(client, newStr)
     elif(msg.topic == targeted_out_ch):
-        handle_targeted_output(client,msg,newStr)
-    else: # Message we don't recognise...
-        strVoid = ""
+        handle_targeted_output(client, msg, newStr)
+    else:  # Message we don't recognise...
+        strVoid = ""  # noqa
 
 
 def handle_targeted_output(client, msg, smsg):
@@ -114,7 +114,7 @@ def _update_gui():
 
 
 def render_lightbulbs():
-    for n in range(0,4):
+    for n in range(0, 4):
         if(client.bulb_1 == 1):
             print(" ###### ", end="")
         else:
@@ -137,11 +137,10 @@ def render_lightbulbs():
 
         print("")
 
-    print(" BULB 1 ",end="")
-    print(" BULB 2 ",end="")
-    print(" BULB 3 ",end="")
-    print(" BULB 4 ",end="")
-
+    print(" BULB 1 ", end="")
+    print(" BULB 2 ", end="")
+    print(" BULB 3 ", end="")
+    print(" BULB 4 ", end="")
     print("")
 
 
@@ -150,10 +149,10 @@ client.run = True
 client.on_connect = on_connect
 client.on_message = on_message
 
-client.bulb_1 = 1
-client.bulb_2 = 1
-client.bulb_3 =1
-client.bulb_4 = 1
+client.bulb_1 = 0
+client.bulb_2 = 0
+client.bulb_3 = 0
+client.bulb_4 = 0
 
 client.connect(config.mqtt_server, 1883, 60)
 
@@ -163,7 +162,7 @@ t.start()
 t2 = threading.Thread(target=_update_gui)
 t2.start()
 
-while client.run == True:
+while client.run is True:
     print("q) to quit")
 
     inpt = input("Please select: ")
