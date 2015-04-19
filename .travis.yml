@@ -4,11 +4,16 @@ python:
 cache:
   directories:
     - $HOME/.pip-cache
+before_install:
+  - chmod -R 777 $HOME/*
+  - sudo apt-get update -qq
+  - sudo apt-get install -y mosquitto
 install:
   - pip install flake8 --download-cache $HOME/.pip-cache
   - pip install -r requirements.txt --use-mirrors --download-cache $HOME/.pip-cache
 before_script:
   - cp config.example.py config.py
+  - cp lifx_config.example.py lifx_config.py
   - flake8 .
 script:
   - python runtests.py
