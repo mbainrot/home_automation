@@ -127,7 +127,7 @@ class test_device_reg_step_1():
         if(msg == "!reregister"):
             client.publish("sys", "!register|" + self.mac_address)
 
-        if(msg.startswith("!register|") and msg.contains(self.mac_address)):
+        if(msg.startswith("!register|") and self.mac_address in msg):
             self.bSentRegister = True
 
     def handle_targeted_sys(self, client, msg):
