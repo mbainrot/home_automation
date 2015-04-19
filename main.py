@@ -145,8 +145,10 @@ def check_and_fix_event_dirs():
     createdir_ifnot_exist(config.working_dir + "/devices/")
     make_writable(config.working_dir + "/devices/")
 
+
 def make_writable(dir):
-    subprocess.call(["chmod","-R","a+rw",dir])
+    subprocess.call(["chmod", "-R", "a+rw", dir])
+
 
 def handle_crontab(client, msg, smsg):
     # Setup our directories
