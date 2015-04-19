@@ -10,6 +10,7 @@ before_install:
 install:
   - pip install flake8 --download-cache $HOME/.pip-cache
   - pip install -r requirements.txt --use-mirrors --download-cache $HOME/.pip-cache
+  - chmod -R 777 $/home/home_automation
 before_script:
   - cp config.example.py config.py
   - cp lifx_config.example.py lifx_config.py
