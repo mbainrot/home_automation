@@ -31,4 +31,4 @@ pip install -r requirements.txt
 3) Starting home_automation
 ```
 cd /home_automation
-./start,sh
+./start.sh
