@@ -60,6 +60,13 @@ class test_device_reg_step_1():
         # Compute extra variables
         self.targeted_sys = "sys_" + self.mac_address
 
+        # Setup our test variables
+        self.bSentRegister = False  # These are only triggered when we /hear/ ourself do it!  # noqa
+        self.bGotRegistered = False
+        self.bGotPing = False
+        self.bSentPong = False  # These are only triggered when we /hear/ ourself do it!  # noqa
+        # self.bTouchFileExists = False  # Redundant - Done in start loop
+
     def start(self):
         client = self.client
         client.on_connect = self.on_connect
@@ -69,10 +76,25 @@ class test_device_reg_step_1():
 
         self.client = client
 
+        threading.Timer(30, self.timer_bStop).start()  # Set a timeout
+
         while self.bStop is False:
             client.loop()
 
         # Compute and return result here :)
+        if(self.bSentRegister is False):
+            return (False, "Something went horribly wrong, " +
+                           "we failed to send !register")
+
+        if(self.bGotRegistered is False):
+            return (False, "Never got registered")
+
+        if(self.bGotPing is False):
+            return (False, "Never got pinged")
+
+        if(self.bSentPong is False):
+            return (False, "Never sent our ping")
+
         if(not os.path.exists(config.working_dir + '/devices/' +
            self.mac_address)):
             return (False, "Failed to create devices file")
@@ -105,6 +127,9 @@ class test_device_reg_step_1():
         if(msg == "!reregister"):
             client.publish("sys", "!register|" + self.mac_address)
 
+        if(msg.startswith("!register|") and msg.contains(self.mac_address)):
+            self.bSentRegister = True
+
     def handle_targeted_sys(self, client, msg):
         parts = msg.split("|")
 
@@ -117,13 +142,17 @@ class test_device_reg_step_1():
             # client.subscribe(targeted_inp_ch)
             # client.subscribe(targeted_out_ch)
 
-            threading.Timer(10, self.timer_bStop).start()
+            self.bGotRegistered = True
 
         if(len(parts) == 2):
             cmd, arg = parts
 
             if(cmd == "!ping"):
+                self.bGotPing = True
                 client.publish(self.targeted_sys, "!pong|" + arg)
+
+            if(cmd == "!pong"):
+                self.bSentPong = True
 
     def timer_bStop(self):
         self.bStop = True
