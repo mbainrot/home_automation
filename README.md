@@ -1,5 +1,5 @@
 # Home Automation
-![Image of the build status](https://travis-ci.org/mbainrot/home_automation.svg?branch=master)
+[![Build Status](https://travis-ci.org/mbainrot/home_automation.svg?branch=revert-31-update_readme)](https://travis-ci.org/mbainrot/home_automation)
 
 Python based automation system which uses mqtt to handle intra-component communication (was formally just for use of ESP8266 devices)
 
