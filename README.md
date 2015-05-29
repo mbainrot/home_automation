@@ -33,7 +33,8 @@ pip install -r requirements.txt
 cp config.example.py config.py
 cp lifx_config.example.py lifx_config.py
 ```
-You then have to edit those files accordingly, config.py generally doesn't need it but for lifx_config.py you will need to specify your API key
+You then have to edit those files accordingly, config.py generally doesn't need it but for lifx_config.py you will need to specify your API key.
+
 4) Start home_automation
 ```
 cd /home_automation
